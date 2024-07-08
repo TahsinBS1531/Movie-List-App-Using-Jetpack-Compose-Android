@@ -1,7 +1,6 @@
-package com.example.movielistapp.Home_Screen.di
+package com.example.movielistapp.core.di
 
 import com.example.movielistapp.Home_Screen.domain.HomeScreenApiInterface
-import com.example.movielistapp.Home_Screen.domain.HomeScreenRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +18,7 @@ object NetworkModule {
     @Singleton
     fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://imdb231.p.rapidapi.com")
+            .baseUrl("https://api.themoviedb.org/3/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

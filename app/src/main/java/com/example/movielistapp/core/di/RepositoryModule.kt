@@ -1,6 +1,5 @@
-package com.example.movielistapp.Home_Screen.di
+package com.example.movielistapp.core.di
 
-import com.example.movielistapp.Home_Screen.domain.BaseRepository
 import com.example.movielistapp.Home_Screen.domain.HomeScreenApiInterface
 import com.example.movielistapp.Home_Screen.domain.HomeScreenRepository
 import dagger.Module

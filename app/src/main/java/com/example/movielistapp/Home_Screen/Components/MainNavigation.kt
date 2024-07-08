@@ -15,32 +15,36 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.movielistapp.Home_Screen.HomeScreenEvent
-import com.example.movielistapp.Home_Screen.domain.HomeScreenViewModel
+import com.example.movielistapp.opening_screen.IntroScreen
 
 
 @Composable
-fun NavigationRoutes(){
+fun NavigationRoutes() {
     val navigationController = rememberNavController()
-    NavHost(navController = navigationController, startDestination = nav_routes.HOME ){
+
+    NavHost(navController = navigationController, startDestination = nav_routes.INTRO ){
+        composable(nav_routes.INTRO){
+            IntroScreen(navigationController = navigationController)
+        }
         composable(nav_routes.HOME){
-            Home(modifier = Modifier)
+            MainNavigation(navigationController)
         }
         composable(nav_routes.SEARCH){
             Search()
@@ -52,23 +56,14 @@ fun NavigationRoutes(){
             Account()
         }
         composable(nav_routes.FILE){
-            Home()
+            Home(modifier = Modifier,navigationController)
         }
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainNavigation(){
-
-
-//    when(uiState){
-//        is BaseViewState.Data -> TODO()
-//        BaseViewState.Empty -> TODO()
-//        is BaseViewState.Error -> TODO()
-//        BaseViewState.Loading -> TODO()
-//    }
-
+fun MainNavigation(navigationController: NavHostController) {
     val navigationController = rememberNavController()
     val context = LocalContext.current.applicationContext
     var selected by remember {
@@ -81,7 +76,7 @@ fun MainNavigation(){
                 selected = Icons.Filled.Home
                 navigationController.navigate(nav_routes.HOME)
             }, modifier = Modifier.weight(1f)) {
-                Icon(Icons.Filled.Home, contentDescription ="Home", tint = if(selected==Icons.Filled.Home) Color.Green else Color.Gray )
+                Icon(Icons.Filled.Home, contentDescription ="Home", tint = if(selected==Icons.Filled.Home) MaterialTheme.colorScheme.tertiary else Color.Gray )
             }
 
 
@@ -93,7 +88,10 @@ fun MainNavigation(){
             }
 
             Box(modifier = Modifier.weight(1f)) {
-                FloatingActionButton(onClick = { Toast.makeText(context,"Item is Added",Toast.LENGTH_SHORT).show() }, shape = FloatingActionButtonDefaults.largeShape) {
+                FloatingActionButton(onClick = { Toast.makeText(context,"Item is Added",Toast.LENGTH_SHORT).show() },
+                    shape = FloatingActionButtonDefaults.largeShape,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.align(Alignment.Center)) {
                     Icon(Icons.Filled.Add, contentDescription = "Add")
                 }
             }
@@ -114,7 +112,9 @@ fun MainNavigation(){
 
         }
     }) {paddingValues->
-        Home(modifier = Modifier.padding(paddingValues))
+        Home(modifier = Modifier.padding(paddingValues),navigationController)
+//        IntroScreen(navigationController = navigationController)
+//        NavigationRoutes(navigationController)
 
     }
 }
@@ -122,11 +122,12 @@ fun MainNavigation(){
 @Preview
 @Composable
 private fun Previewnavigation() {
-    MainNavigation()
+    MainNavigation(rememberNavController())
 }
 
 
 object nav_routes{
+    const val INTRO ="intro"
     const val HOME = "home"
     const val FILE ="file"
     const val ADD = "add"

@@ -1,5 +1,9 @@
 package com.example.movielistapp.Home_Screen.Components
 
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,9 +19,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -27,11 +35,16 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -43,52 +56,72 @@ import com.example.movielistapp.R
 class ImageSliderSection {
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageSection(modifier: Modifier=Modifier,height:Int){
 
     var gradientColor = listOf(Color(0XFFFF8F71),Color(0XFFEF2D1A))
-    Box (modifier = modifier
+    val images = remember {
+        mutableStateListOf(
+            R.drawable.wide,
+            R.drawable.wide1,
+            R.drawable.wide3
+        )
+    }
+
+    val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f, pageCount = {images.size})
+
+    Column (modifier = modifier
         .fillMaxWidth()
         .height(height.dp)){
-        Image(painter = painterResource(id = R.drawable.star_war),
-            contentDescription = "Star War",
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Crop)
-
-        IconButton(onClick = { /*TODO*/ }, modifier = Modifier
-            .size(50.dp)
-            .background(
-                brush = Brush.linearGradient(gradientColor), shape = RoundedCornerShape(30.dp)
+        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth()) {
+            val pageOffset =  (pagerState.currentPage-it)+ pagerState.currentPageOffsetFraction
+            val imageSize by animateFloatAsState(
+                targetValue = if(pageOffset!=0.0f) 0.75f else 1f,
+                animationSpec = tween(300), label = ""
             )
-            .border(1.dp, color = Color.White, shape = RoundedCornerShape(30.dp))
-            .align(Alignment.Center)) {
-            Icon(Icons.Default.PlayArrow, contentDescription = "Null", tint = Color.White)
+
+            Image(painter = painterResource(id = images[it]), contentDescription = "images",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .graphicsLayer {
+                        scaleX = imageSize
+                        scaleY = imageSize
+                    })
         }
-    }
+        }
 }
 
 @Composable
 fun CardTitile(title:String){
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = title, style = MaterialTheme.typography.titleMedium)
+        Text(text = title, style = MaterialTheme.typography.headlineMedium.copy(
+            color = MaterialTheme.colorScheme.tertiary
+        ))
     }
 }
 
 
 @Composable
-fun ScrollableCard(modifier: Modifier=Modifier,imageUrl:String,imageTitile:String, rating:Int){
+fun ScrollableCard(modifier: Modifier=Modifier,imageUrl:String,imageTitile:String){
     ElevatedCard(modifier = modifier
-        .height(250.dp)
-        .width(200.dp), shape = MaterialTheme.shapes.medium) {
+        .height(270.dp)
+        .width(150.dp), shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
         Column(modifier = Modifier
-            .width(200.dp)
-            .height(250.dp)) {
-            AsyncImage(model = imageUrl, contentDescription = "Movie", modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()) {
+            AsyncImage(model ="https://image.tmdb.org/t/p/w500/${imageUrl}", contentDescription = "Movie", modifier = Modifier
                 .height(180.dp)
                 .fillMaxWidth(), contentScale = ContentScale.Crop
             )
-            Text(text = imageTitile, modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp), style = MaterialTheme.typography.titleMedium)
-            Text(text = "Ranking $rating", modifier = Modifier.padding(horizontal = 10.dp), style = MaterialTheme.typography.bodyMedium)
+            Text(text = imageTitile, modifier = Modifier.padding(vertical = 10.dp,horizontal = 10.dp),
+                style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.secondary))
+//            Text(text = "IMDB : $rating", modifier = Modifier.padding(horizontal = 10.dp), style = MaterialTheme.typography.bodyMedium)
         }
 
     }

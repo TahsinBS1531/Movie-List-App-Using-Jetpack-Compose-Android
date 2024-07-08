@@ -1,4 +1,4 @@
-package com.example.movielistapp.Home_Screen.domain
+package com.example.movielistapp.core.repository
 
 import retrofit2.Response
 

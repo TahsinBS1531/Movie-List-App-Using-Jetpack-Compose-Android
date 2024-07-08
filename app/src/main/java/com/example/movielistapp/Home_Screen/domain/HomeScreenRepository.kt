@@ -1,12 +1,22 @@
 package com.example.movielistapp.Home_Screen.domain
 
-import com.example.movielistapp.Home_Screen.model.TopRatedResponse
+import com.example.movielistapp.Home_Screen.model2.PopularMoviesResponse
+import com.example.movielistapp.Home_Screen.model2.TopRatedMoviesResponse2
+import com.example.movielistapp.core.repository.BaseRepository
+import com.example.movielistapp.core.repository.mapSuccess
 import javax.inject.Inject
 
-class HomeScreenRepository @Inject constructor (private val api:HomeScreenApiInterface):BaseRepository {
+class HomeScreenRepository @Inject constructor (private val api:HomeScreenApiInterface):
+    BaseRepository {
 
-    suspend fun getTopRatedMovies():TopRatedResponse{
-        return api.getTopRatedMovies("imdb231.p.rapidapi.com","324b5b8ec3mshcdbbd1cd5b0de70p159039jsnb2cadae3ed8d").mapSuccess {
+    suspend fun getTopRatedMovies():TopRatedMoviesResponse2{
+        return api.getTopRatedMovies().mapSuccess {
+            it
+        }
+    }
+
+    suspend fun getPopularMovies():PopularMoviesResponse{
+        return api.getPopularMovies().mapSuccess {
             it
         }
     }

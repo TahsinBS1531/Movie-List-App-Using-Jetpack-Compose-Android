@@ -1,5 +1,6 @@
 package com.example.movielistapp.Home_Screen.Components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,71 +22,88 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.movielistapp.Home_Screen.HomeScreenEvent
 import com.example.movielistapp.Home_Screen.HomeScreenViewState
-import com.example.movielistapp.Home_Screen.domain.BaseViewState
+import com.example.movielistapp.core.viewmodel.BaseViewState
 import com.example.movielistapp.Home_Screen.domain.HomeScreenViewModel
+import com.example.movielistapp.Home_Screen.model2.PopularMoviesResponse
+import com.example.movielistapp.Home_Screen.model2.TopRatedMoviesResponse2
 
 
 @Composable
-fun Home(modifier: Modifier = Modifier, viewModel: HomeScreenViewModel = hiltViewModel()){
+fun Home(modifier: Modifier = Modifier, navigationController:NavController,viewModel: HomeScreenViewModel = hiltViewModel()){
     val scroll = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(key1 = viewModel){
         viewModel.ontriggerEvent(HomeScreenEvent.LoadTopRatedMovies)
+        viewModel.ontriggerEvent(HomeScreenEvent.LoadtPopularMovies)
     }
+
+
 
     Column(modifier = modifier
         .fillMaxWidth()
-        .padding(bottom = 20.dp)
-        .verticalScroll(scroll)) {
+        .verticalScroll(scroll)
+        .background(color = MaterialTheme.colorScheme.primary)) {
 
         ImageSection(modifier = Modifier,300)
         Column(horizontalAlignment = Alignment.CenterHorizontally
         , verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .padding(top = 16.dp, start = 16.dp)) {
-            CardTitile(title = "Top Rated Movies")
-            ShowingCardItems(uiState)
-            CardTitile(title = "Upcoming Movies")
-            ShowingCardItems(uiState)
+            when(uiState){
+                is BaseViewState.Data -> {
+                    val homeScreenViewState = (uiState as BaseViewState.Data<*>).value as? HomeScreenViewState
+                    val topRatedMovies = homeScreenViewState?.topRatedModel
+                    val popularMovies = homeScreenViewState?.popularMovieModel
+                    CardTitile(title = "Top Rated Movies")
+                    ShowingCardItems(topRatedMovies, null)
+                    CardTitile(title = "Upcoming Movies")
+                    ShowingCardItems(null,popularMovies)
+                }
+                BaseViewState.Empty -> Text(text = "Sorry The response is empty")
+                is BaseViewState.Error -> Text(text = "Error for loading the data")
+                BaseViewState.Loading -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(trackColor = MaterialTheme.colorScheme.primary)
+                    }
+                }
+            }
 
         }
     }
 
 }
 
-@Composable
-fun ShowingCardItems(uiState: BaseViewState<*>) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        when(uiState){
-            is BaseViewState.Data -> {
-                val homeScreenViewState = uiState.value as? HomeScreenViewState
-                homeScreenViewState?.topRatedModel?.data?.titleChartRankings?.edges?.let { edges ->
-                    items(edges) { edge ->
-                        val item =edge.node.item
-                        ScrollableCard(modifier = Modifier,imageUrl = item.primaryImage.url, imageTitile = item.originalTitleText.text.toString(), rating = item.ratingsSummary.topRanking.rank)
-                    }
-                }
-            }
 
-            BaseViewState.Empty -> {
-                item {
-                    Text("No data available", modifier = Modifier.padding(16.dp))
-                }
+@Composable
+fun ShowingCardItems(
+    topRated: TopRatedMoviesResponse2? = null,
+    popularMovies: PopularMoviesResponse?=null
+) {
+
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        if(topRated!=null){
+            val response = topRated.results
+            items(topRated.results.size){
+                val singleItem = response[it]
+                ScrollableCard(modifier = Modifier,imageUrl = singleItem.poster_path, imageTitile = singleItem.original_title)
             }
-            is BaseViewState.Error -> {
-                item {
-                    Text("An error occurred: ${uiState.throwable.message}", modifier = Modifier.padding(16.dp))
-                }
+        }else if(popularMovies!=null){
+            val response = popularMovies.results
+            items(response.size){
+                val singleItem = response[it]
+                ScrollableCard(modifier = Modifier,imageUrl = singleItem.poster_path, imageTitile = singleItem.original_title)
             }
-            BaseViewState.Loading -> {
-                item {
-                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                }
-            }
-        }
+    }
 
     }
 }
@@ -92,5 +111,5 @@ fun ShowingCardItems(uiState: BaseViewState<*>) {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewHomeSection() {
-    Home(modifier = Modifier.fillMaxSize())
+    Home(modifier = Modifier.fillMaxSize(), rememberNavController())
 }
