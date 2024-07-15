@@ -1,10 +1,10 @@
 package com.example.movielistapp.Home_Screen.Components
 
-import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 
 
 @Composable
-fun Search(){
+fun Search(navigationController: NavHostController) {
 
 }

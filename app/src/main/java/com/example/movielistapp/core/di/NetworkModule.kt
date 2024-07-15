@@ -1,6 +1,7 @@
 package com.example.movielistapp.core.di
 
 import com.example.movielistapp.Home_Screen.domain.HomeScreenApiInterface
+import com.example.movielistapp.movie_details.domain.MovieDetailsApiInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,6 +28,12 @@ object NetworkModule {
     @Singleton
     fun getTopRatedApi(api:Retrofit):HomeScreenApiInterface{
         return api.create(HomeScreenApiInterface::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun getMovieDetailsApi(api:Retrofit):MovieDetailsApiInterface{
+        return api.create(MovieDetailsApiInterface::class.java)
     }
 
 

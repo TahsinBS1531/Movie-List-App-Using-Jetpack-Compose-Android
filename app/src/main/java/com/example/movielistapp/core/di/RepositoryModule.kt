@@ -2,6 +2,8 @@ package com.example.movielistapp.core.di
 
 import com.example.movielistapp.Home_Screen.domain.HomeScreenApiInterface
 import com.example.movielistapp.Home_Screen.domain.HomeScreenRepository
+import com.example.movielistapp.movie_details.domain.MovieDetailsApiInterface
+import com.example.movielistapp.movie_details.domain.MovieDetailsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,5 +19,11 @@ object RepositoryModule {
     @Singleton
     fun provideHomeRepository(api :HomeScreenApiInterface):HomeScreenRepository{
         return HomeScreenRepository(api)
+    }
+
+    @Provides
+    @Singleton
+    fun ProvidesMovieDetailsRepository(api:MovieDetailsApiInterface):MovieDetailsRepository{
+        return MovieDetailsRepository(api)
     }
 }
