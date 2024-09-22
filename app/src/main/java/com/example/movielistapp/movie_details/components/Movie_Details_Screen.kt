@@ -139,13 +139,13 @@ fun MovieDetailsImage(
 @Composable
 fun DetailsSection(modifier: Modifier = Modifier, data: MovieDetailsState?){
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(text = "${data?.movieData?.original_title}", color = MaterialTheme.colorScheme.secondary,
+        Text(text = "${data?.movieData?.title}", color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.headlineMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(30.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 Icon(Icons.Filled.Star, contentDescription ="Star", tint = MaterialTheme.colorScheme.tertiary )
-                Text(text = "${data?.movieData?.vote_average}",color = MaterialTheme.colorScheme.secondary)
+                Text(text = "${data?.movieData?.vote}",color = MaterialTheme.colorScheme.secondary)
             }
 
             Row(verticalAlignment = Alignment.CenterVertically,
@@ -157,7 +157,7 @@ fun DetailsSection(modifier: Modifier = Modifier, data: MovieDetailsState?){
         FlowRow(horizontalArrangement = Arrangement.spacedBy(26.dp)){
             data?.movieData?.genres?.forEach {
                 SuggestionChip(onClick = { /*TODO*/ }, label = {
-                    Text(text = it.name)
+                    Text(text = it)
                 }, border = BorderStroke(1.dp,Color.White),
                     colors = SuggestionChipDefaults.suggestionChipColors(labelColor = MaterialTheme.colorScheme.secondary))
             }

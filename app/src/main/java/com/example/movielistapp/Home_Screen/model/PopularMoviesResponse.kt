@@ -1,6 +1,14 @@
-package com.example.movielistapp.Home_Screen.model2
+package com.example.movielistapp.Home_Screen.model
 
-data class Result(
+data class PopularMoviesResponse(
+    val page: Int,
+    val results: List<ResultX>,
+    val total_pages: Int,
+    val total_results: Int
+)
+
+
+data class ResultX(
     val adult: Boolean,
     val backdrop_path: String,
     val genre_ids: List<Int>,

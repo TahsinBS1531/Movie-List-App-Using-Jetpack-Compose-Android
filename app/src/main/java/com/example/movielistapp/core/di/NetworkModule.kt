@@ -1,6 +1,7 @@
 package com.example.movielistapp.core.di
 
 import com.example.movielistapp.Home_Screen.domain.HomeScreenApiInterface
+import com.example.movielistapp.core.db.MovieDao
 import com.example.movielistapp.movie_details.domain.MovieDetailsApiInterface
 import dagger.Module
 import dagger.Provides
@@ -35,6 +36,8 @@ object NetworkModule {
     fun getMovieDetailsApi(api:Retrofit):MovieDetailsApiInterface{
         return api.create(MovieDetailsApiInterface::class.java)
     }
+
+
 
 
 

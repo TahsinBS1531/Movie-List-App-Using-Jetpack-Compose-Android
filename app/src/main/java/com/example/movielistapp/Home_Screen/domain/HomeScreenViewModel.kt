@@ -15,17 +15,14 @@ class HomeScreenViewModel @Inject constructor(val repository : HomeScreenReposit
 
     private var _data = HomeScreenViewState()
     init {
-        setState(BaseViewState.Empty)
+        setState(BaseViewState.Data(_data))
     }
-//    val data: HomeScreenViewState get() = _data
 
     override fun ontriggerEvent(eventType: HomeScreenEvent) {
         when (eventType) {
-            is HomeScreenEvent.LoadTopRatedMovies -> {
-                loadTopRatedData()
-            }
-
+            is HomeScreenEvent.LoadTopRatedMovies -> loadTopRatedData()
             HomeScreenEvent.LoadtPopularMovies -> loadPopularMovies()
+            HomeScreenEvent.SaveOfflineData -> saveOfflineMovies()
         }
     }
 
@@ -34,7 +31,9 @@ class HomeScreenViewModel @Inject constructor(val repository : HomeScreenReposit
         viewModelScope.launch {
             try {
                 startLoading()
-                val movies = repository.getTopRatedMovies()
+                val movies = repository.getTopRatedMovies().map {
+                    it.toMovieDto()
+                }
                 _data = _data.copy(topRatedModel = movies)
                 setState(BaseViewState.Data(_data))
             } catch (e: Exception) {
@@ -47,7 +46,9 @@ class HomeScreenViewModel @Inject constructor(val repository : HomeScreenReposit
         viewModelScope.launch {
             try {
                 startLoading()
-                val movies = repository.getPopularMovies()
+                val movies = repository.getPopularMovies().map {
+                    it.toMovieDto()
+                }
                 _data = _data.copy(popularMovieModel = movies)
                 setState(BaseViewState.Data(_data))
             }catch (e:Exception){
@@ -55,6 +56,17 @@ class HomeScreenViewModel @Inject constructor(val repository : HomeScreenReposit
             }
         }
     }
+
+    private fun saveOfflineMovies(){
+        viewModelScope.launch {
+            try {
+                repository.appSync()
+            }catch (e:Exception){
+                handleError(e)
+            }
+        }
+    }
+
 
 
 

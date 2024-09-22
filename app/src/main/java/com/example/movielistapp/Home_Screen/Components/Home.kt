@@ -25,14 +25,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.movielistapp.Home_Screen.HomeScreenEvent
 import com.example.movielistapp.Home_Screen.HomeScreenViewState
 import com.example.movielistapp.core.viewmodel.BaseViewState
 import com.example.movielistapp.Home_Screen.domain.HomeScreenViewModel
-import com.example.movielistapp.Home_Screen.model2.PopularMoviesResponse
-import com.example.movielistapp.Home_Screen.model2.TopRatedMoviesResponse2
+import com.example.movielistapp.Home_Screen.model.movieDto
 
 
 @Composable
@@ -123,29 +121,32 @@ fun HomeScreen(
 
 @Composable
 fun ShowingCardItems(
-    topRated: TopRatedMoviesResponse2? = null,
-    popularMovies: PopularMoviesResponse? = null,
+    topRated: List<movieDto>? = null,
+    popularMovies: List<movieDto>? = null,
     navigationController: NavController
 ) {
 
     LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         if(topRated!=null){
-            val response = topRated.results
-            items(topRated.results.size){
-                val singleItem = response[it]
+
+            items(topRated.size){
+                val singleItem = topRated[it]
                 ScrollableCard(modifier = Modifier.clickable {
-                    val movieId = topRated.results[it].id
+                    val movieId = topRated[it].id
                     navigationController.navigate("${nav_routes.MOVIE_DETAILS}/$movieId")
-                },imageUrl = singleItem.poster_path, imageTitile = singleItem.original_title)
+                },imageUrl = singleItem.poster, imageTitile = singleItem.title)
             }
-        }else if(popularMovies!=null){
-            val response = popularMovies.results
+        }else{
+
+        }
+        if(popularMovies!=null){
+            val response = popularMovies
             items(response.size){
                 val singleItem = response[it]
                 ScrollableCard(modifier = Modifier.clickable {
                     val movieId = singleItem.id
                     navigationController.navigate("${nav_routes.MOVIE_DETAILS}/$movieId")
-                },imageUrl = singleItem.poster_path, imageTitile = singleItem.original_title)
+                },imageUrl = singleItem.poster, imageTitile = singleItem.title)
             }
     }
     }
